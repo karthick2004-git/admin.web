@@ -1,15 +1,7 @@
 export default function MobileHeader({ onMenuToggle, onLogout }) {
   return (
-    <header className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b px-4 py-3"
-            style={{
-              background:'rgba(20, 26, 36, 0.8)', 
-              borderColor:'var(--border)',
-              backdropFilter: 'blur(10px)',
-              WebkitBackdropFilter: 'blur(10px)',
-              height: 'var(--header-height)',
-              display: 'flex',
-              alignItems: 'center'
-            }}>
+    <header className="lg:hidden fixed top-0 left-0 right-0 z-50 border-b px-4 py-3 bg-[#141a24]/80 backdrop-blur-xl flex items-center h-[var(--header-height)]"
+            style={{ borderColor:'var(--border)' }}>
       <div className="flex items-center justify-between w-full">
         <button onClick={onMenuToggle}
           className="p-2 rounded-lg transition-colors hover:bg-white/5"

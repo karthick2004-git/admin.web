@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-export default function CustomersSection({ customers, onDelete }) {
+export default function CustomersSection({ customers, onDelete, onView }) {
   const [search, setSearch] = useState('');
 
   const filtered = customers.filter(c => 
@@ -42,6 +42,7 @@ export default function CustomersSection({ customers, onDelete }) {
                 <tr className="bg-opacity-50" style={{background:'rgba(0,0,0,0.02)'}}>
                   <th className="px-6 py-4 text-xs font-extrabold uppercase tracking-widest" style={{color:'var(--text-muted)'}}>Customer</th>
                   <th className="px-6 py-4 text-xs font-extrabold uppercase tracking-widest" style={{color:'var(--text-muted)'}}>Signup Date</th>
+                  <th className="px-6 py-4 text-xs font-extrabold uppercase tracking-widest" style={{color:'var(--text-muted)'}}>Phone</th>
                   <th className="px-6 py-4 text-xs font-extrabold uppercase tracking-widest" style={{color:'var(--text-muted)'}}>Status</th>
                   <th className="px-6 py-4 text-xs font-extrabold uppercase tracking-widest" style={{color:'var(--text-muted)'}}>Orders</th>
                   <th className="px-6 py-4 text-xs font-extrabold uppercase tracking-widest text-right" style={{color:'var(--text-muted)'}}>Actions</th>
@@ -66,6 +67,11 @@ export default function CustomersSection({ customers, onDelete }) {
                       <p className="text-sm font-medium">{formatDate(customer.created_at)}</p>
                     </td>
                     <td className="px-6 py-5">
+                      <p className="text-sm font-medium" style={{color: customer.orders?.[0]?.phone ? 'inherit' : 'var(--text-muted)'}}>
+                        {customer.orders?.[0]?.phone || 'N/A'}
+                      </p>
+                    </td>
+                    <td className="px-6 py-5">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${customer.is_verified ? 'bg-green-100 text-green-600' : 'bg-yellow-100 text-yellow-600'}`}>
                         {customer.is_verified ? 'Verified' : 'Unverified'}
                       </span>
@@ -73,7 +79,13 @@ export default function CustomersSection({ customers, onDelete }) {
                     <td className="px-6 py-5 text-sm font-semibold">
                       {customer._count?.orders || 0}
                     </td>
-                    <td className="px-6 py-5 text-right">
+                    <td className="px-6 py-5 text-right flex items-center justify-end gap-2">
+                      <button onClick={() => onView(customer)} className="btn-icon inline-flex" title="View Customer Details">
+                        <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                        </svg>
+                      </button>
                       <button onClick={() => onDelete(customer.id)} className="btn-icon danger inline-flex" title="Delete Customer">
                         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>

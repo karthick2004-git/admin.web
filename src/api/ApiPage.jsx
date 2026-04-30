@@ -75,6 +75,18 @@ const ApiPage = {
       body: JSON.stringify(settings),
     });
   },
+
+  // --- Support ---
+  fetchSupportRequests: async () => {
+    return await ApiClientPrivate(ApiEndUrl.admin.support);
+  },
+
+  updateSupportStatus: async (id, status) => {
+    return await ApiClientPrivate(ApiEndUrl.admin.support, {
+      method: 'PUT',
+      body: JSON.stringify({ id, status }),
+    });
+  },
 };
 
 export default ApiPage;

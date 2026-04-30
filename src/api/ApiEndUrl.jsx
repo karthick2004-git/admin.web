@@ -12,6 +12,7 @@ const ApiEndUrl = {
     customers: `${BASE_URL}/admin/customers`,
     deleteCustomer: `${BASE_URL}/admin/delete-customer`,
     paymentSettings: `${BASE_URL}/admin/payment-settings`,
+    support: `${BASE_URL}/admin/support`,
   },
   customer: {
     register: `${BASE_URL}/customer/register`,
@@ -21,6 +22,7 @@ const ApiEndUrl = {
     products: `${BASE_URL}/customer/products`,
     order: `${BASE_URL}/customer/order`,
     orders: `${BASE_URL}/customer/orders`,
+    support: `${BASE_URL}/customer/support`,
   }
 };
 

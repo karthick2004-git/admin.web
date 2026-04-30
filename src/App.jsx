@@ -12,8 +12,10 @@ import OrdersSection from './components/sections/OrdersSection';
 import PaymentsSection from './components/sections/PaymentsSection';
 import CheckoutSection from './components/sections/CheckoutSection';
 import CustomersSection from './components/sections/CustomersSection';
+import SupportSection from './components/sections/SupportSection';
 import ProductModal from './components/modals/ProductModal';
 import OrderModal from './components/modals/OrderModal';
+import CustomerModal from './components/modals/CustomerModal';
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
 function load(key, fallback) {
@@ -36,6 +38,7 @@ export default function App() {
   const [customers, setCustomers]         = useState([]);
   const [paymentSettings, setPayments]    = useState(defaultPaymentSettings);
   const [stats, setStats]                 = useState({ totalOrders: 0, totalProducts: 0, totalCustomers: 0, totalRevenue: 0 });
+  const [supportRequests, setSupportRequests] = useState([]);
 
   // ── ui state ──────────────────────────────────────────────────────────────
   const [activeSection, setActiveSection] = useState('dashboard-section');
@@ -47,6 +50,8 @@ export default function App() {
   const [editingProduct, setEditingProduct]     = useState(null);
   const [orderModalOpen, setOrderModalOpen]     = useState(false);
   const [viewingOrder, setViewingOrder]         = useState(null);
+  const [customerModalOpen, setCustomerModalOpen] = useState(false);
+  const [viewingCustomer, setViewingCustomer]     = useState(null);
 
   // ── toast ─────────────────────────────────────────────────────────────────
   const showToast = useCallback((message, type = 'success') => {
@@ -60,18 +65,20 @@ export default function App() {
     if (isLoggedIn) {
       const fetchData = async () => {
         try {
-          const [pData, oData, cData, sData, payData] = await Promise.all([
+          const [pData, oData, cData, sData, payData, supData] = await Promise.all([
             ApiPage.fetchProducts(),
             ApiPage.fetchOrders(),
             ApiPage.fetchCustomers(),
             ApiPage.fetchDashboardStats(),
-            ApiPage.fetchPaymentSettings()
+            ApiPage.fetchPaymentSettings(),
+            ApiPage.fetchSupportRequests()
           ]);
           setProducts(pData.products);
           setOrders(oData.orders);
           setCustomers(cData.customers);
           setStats(sData.stats);
           setPayments(payData.paymentSettings);
+          setSupportRequests(supData.supportRequests || []);
         } catch (error) {
           showToast(error.message, 'error');
         }
@@ -189,6 +196,11 @@ export default function App() {
     }
   };
 
+  const handleViewCustomer = (customer) => {
+    setViewingCustomer(customer);
+    setCustomerModalOpen(true);
+  };
+
   // ── payment handlers ──────────────────────────────────────────────────────
   const handleTogglePayment = async (method) => {
     try {
@@ -226,6 +238,17 @@ export default function App() {
     showToast('QR Code uploaded successfully', 'success');
   };
 
+  // ── support handlers ──────────────────────────────────────────────────────
+  const handleUpdateSupportStatus = async (id, status) => {
+    try {
+      await ApiPage.updateSupportStatus(id, status);
+      setSupportRequests(prev => prev.map(r => r.id === id ? { ...r, status } : r));
+      showToast('Support status updated', 'success');
+    } catch (error) {
+      showToast(error.message, 'error');
+    }
+  };
+
   // ── render ────────────────────────────────────────────────────────────────
   if (!isLoggedIn) {
     return (
@@ -242,7 +265,8 @@ export default function App() {
     'orders-section':    <OrdersSection orders={orders} onView={handleViewOrder} onUpdateStatus={handleUpdateOrderStatus} onCancel={handleCancelOrder}/>,
     'payments-section':  <PaymentsSection paymentSettings={paymentSettings} onToggle={handleTogglePayment} onSave={handleSavePayments} onQRUpload={handleQRUpload}/>,
     'checkout-section':  <CheckoutSection orders={orders}/>,
-    'customers-section': <CustomersSection customers={customers} onDelete={handleDeleteCustomer}/>,
+    'customers-section': <CustomersSection customers={customers} onDelete={handleDeleteCustomer} onView={handleViewCustomer}/>,
+    'support-section':   <SupportSection supportRequests={supportRequests} onUpdateStatus={handleUpdateSupportStatus}/>,
   };
 
   return (
@@ -282,6 +306,11 @@ export default function App() {
         isOpen={orderModalOpen}
         onClose={() => setOrderModalOpen(false)}
         order={viewingOrder}
+      />
+      <CustomerModal
+        isOpen={customerModalOpen}
+        onClose={() => setCustomerModalOpen(false)}
+        customer={viewingCustomer}
       />
     </>
   );
