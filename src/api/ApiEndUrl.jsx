@@ -1,4 +1,4 @@
-const BASE_URL = 'https://ecommerceweb-backend-fsl5.vercel.app';
+const BASE_URL = 'https://ecommerceweb-backend-fsl5.vercel.app/api';
 
 const ApiEndUrl = {
   admin: {
