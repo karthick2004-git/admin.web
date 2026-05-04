@@ -11,7 +11,7 @@ export default function MobileHeader({ onMenuToggle, onLogout }) {
           </svg>
         </button>
         <div className="text-center">
-          <h1 className="font-display font-bold text-base tracking-widest uppercase">Cozy Hood</h1>
+          <h1 className="font-display font-bold text-base tracking-widest uppercase">Atix Outfits</h1>
           <p className="text-[10px] uppercase font-bold text-muted" style={{color:'var(--accent)'}}>Admin Panel</p>
         </div>
         <button onClick={onLogout}

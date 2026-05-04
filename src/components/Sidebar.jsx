@@ -40,7 +40,7 @@ export default function Sidebar({ activeSection, onSectionChange, onLogout }) {
             </svg>
           </div>
           <div>
-            <h1 className="font-display font-bold text-lg">ShopAdmin</h1>
+            <h1 className="font-display font-bold text-lg">Atix Admin</h1>
             <div className="flex items-center gap-2">
               <div className="live-dot"/>
               <p className="text-xs" style={{color:'var(--text-muted)'}}>Live Dashboard</p>
