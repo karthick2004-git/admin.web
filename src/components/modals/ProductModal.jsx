@@ -1,12 +1,21 @@
 import { useState, useEffect, useRef } from 'react';
 
+const DEFAULT_MODAL_CATEGORIES = [
+  { value: 'new-arrivals', label: 'New Arrivals' },
+  { value: 'shirts',       label: 'Shirts' },
+  { value: 't-shirts',     label: 'T-Shirts' },
+];
+
 export default function ProductModal({ isOpen, onClose, onSave, editProduct }) {
   const [form, setForm] = useState({
     name: '', category: '', image: '', price: '', discount: '0',
-    stock: '', sizes: '', description: ''
+    stock: '', sizes: [], description: ''
   });
   const [imagePreview, setImagePreview] = useState('');
   const fileInputRef = useRef();
+  const [categories, setCategories] = useState(DEFAULT_MODAL_CATEGORIES);
+  const [showAddCat, setShowAddCat] = useState(false);
+  const [newCatName, setNewCatName] = useState('');
 
   useEffect(() => {
     if (editProduct) {
@@ -17,12 +26,12 @@ export default function ProductModal({ isOpen, onClose, onSave, editProduct }) {
         price: editProduct.price,
         discount: editProduct.discount,
         stock: editProduct.stock,
-        sizes: editProduct.sizes.join(', '),
+        sizes: editProduct.sizes || [],
         description: editProduct.description,
       });
       setImagePreview(editProduct.image);
     } else {
-      setForm({ name:'', category:'', image:'', price:'', discount:'0', stock:'', sizes:'', description:'' });
+      setForm({ name:'', category:'', image:'', price:'', discount:'0', stock:'', sizes:[], description:'' });
       setImagePreview('');
     }
   }, [editProduct, isOpen]);
@@ -76,9 +85,27 @@ export default function ProductModal({ isOpen, onClose, onSave, editProduct }) {
       price: parseInt(form.price),
       discount: parseInt(form.discount) || 0,
       stock: parseInt(form.stock),
-      sizes: form.sizes.split(',').map(s => s.trim()).filter(Boolean),
+      sizes: form.sizes,
       description: form.description,
     }, editProduct?.id);
+  };
+
+  const toggleSize = (size) => {
+    setForm(f => {
+      const next = f.sizes.includes(size)
+        ? f.sizes.filter(s => s !== size)
+        : [...f.sizes, size];
+      return { ...f, sizes: next };
+    });
+  };
+
+  const handleDiscountChange = (val) => {
+    // If it's just '0' and user types a digit, replace it
+    let cleaned = val;
+    if (form.discount === '0' && val.length > 1 && val.startsWith('0')) {
+      cleaned = val.substring(1);
+    }
+    setForm(f => ({...f, discount: cleaned}));
   };
 
   return (
@@ -104,10 +131,70 @@ export default function ProductModal({ isOpen, onClose, onSave, editProduct }) {
             <label className="block text-sm font-medium mb-2" style={{color:'var(--text-secondary)'}}>Category</label>
             <select className="input-field" required value={form.category} onChange={e => setForm(f => ({...f, category: e.target.value}))}>
               <option value="">Select category</option>
-              <option value="new-arrivals">New Arrivals</option>
-              <option value="shirts">Shirts</option>
-              <option value="t-shirts">T-Shirts</option>
+              {categories.map(cat => (
+                <option key={cat.value} value={cat.value}>{cat.label}</option>
+              ))}
             </select>
+            {/* Inline add category */}
+            {showAddCat ? (
+              <div className="flex gap-1.5 mt-2">
+                <input
+                  type="text"
+                  className="input-field text-sm"
+                  style={{height:36}}
+                  placeholder="e.g. Hoodies"
+                  value={newCatName}
+                  onChange={e => setNewCatName(e.target.value)}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const trimmed = newCatName.trim();
+                      if (!trimmed) return;
+                      const value = trimmed.toLowerCase().replace(/\s+/g, '-');
+                      const label = trimmed.replace(/\b\w/g, l => l.toUpperCase());
+                      if (!categories.find(c => c.value === value)) {
+                        setCategories(prev => [...prev, { value, label }]);
+                      }
+                      setForm(f => ({ ...f, category: value }));
+                      setNewCatName('');
+                      setShowAddCat(false);
+                    }
+                    if (e.key === 'Escape') { setShowAddCat(false); setNewCatName(''); }
+                  }}
+                  autoFocus
+                />
+                <button type="button"
+                  onClick={() => {
+                    const trimmed = newCatName.trim();
+                    if (!trimmed) return;
+                    const value = trimmed.toLowerCase().replace(/\s+/g, '-');
+                    const label = trimmed.replace(/\b\w/g, l => l.toUpperCase());
+                    if (!categories.find(c => c.value === value)) {
+                      setCategories(prev => [...prev, { value, label }]);
+                    }
+                    setForm(f => ({ ...f, category: value }));
+                    setNewCatName('');
+                    setShowAddCat(false);
+                  }}
+                  className="px-3 rounded-lg text-white text-sm font-semibold flex-shrink-0"
+                  style={{background:'var(--accent)', height:36}}>Add</button>
+                <button type="button" onClick={() => { setShowAddCat(false); setNewCatName(''); }}
+                  className="btn-icon flex-shrink-0">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                </button>
+              </div>
+            ) : (
+              <button type="button" onClick={() => setShowAddCat(true)}
+                className="mt-2 flex items-center gap-1 text-xs font-semibold px-2 py-1 rounded-lg"
+                style={{color:'var(--accent)', background:'var(--accent-soft)'}}>
+                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"/>
+                </svg>
+                Add Category
+              </button>
+            )}
           </div>
 
           <div>
@@ -146,7 +233,7 @@ export default function ProductModal({ isOpen, onClose, onSave, editProduct }) {
             <div>
               <label className="block text-sm font-medium mb-2" style={{color:'var(--text-secondary)'}}>Discount (%)</label>
               <input type="number" className="input-field" placeholder="10"
-                value={form.discount} onChange={e => setForm(f => ({...f, discount: e.target.value}))}/>
+                value={form.discount} onChange={e => handleDiscountChange(e.target.value)}/>
             </div>
           </div>
 
@@ -158,8 +245,25 @@ export default function ProductModal({ isOpen, onClose, onSave, editProduct }) {
             </div>
             <div>
               <label className="block text-sm font-medium mb-2" style={{color:'var(--text-secondary)'}}>Sizes</label>
-              <input type="text" className="input-field" placeholder="S, M, L, XL"
-                value={form.sizes} onChange={e => setForm(f => ({...f, sizes: e.target.value}))}/>
+              <div className="flex flex-wrap gap-2">
+                {['S', 'M', 'L', 'XL', 'XXL'].map(sz => {
+                  const isActive = form.sizes.includes(sz);
+                  return (
+                    <button
+                      key={sz}
+                      type="button"
+                      onClick={() => toggleSize(sz)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-bold transition-all border"
+                      style={{
+                        background: isActive ? 'var(--accent)' : 'var(--bg-secondary)',
+                        color: isActive ? '#fff' : 'var(--text-secondary)',
+                        borderColor: isActive ? 'var(--accent)' : 'var(--border)'
+                      }}>
+                      {sz}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
           </div>
 

@@ -30,13 +30,15 @@ export default function PaymentsSection({ paymentSettings, onToggle, onSave, onQ
   return (
     <section className="animate-in">
       <div className="page-header">
-        <div>
-          <h1 className="font-display text-2xl font-bold">Payment Configuration</h1>
-          <p className="text-xs" style={{color:'var(--text-muted)'}}>Manage transaction methods and gateways</p>
+        <div className="flex-1 min-w-0">
+          <h1 className="font-display text-2xl font-bold whitespace-nowrap">Payment Configuration</h1>
+          <p className="text-xs mt-1" style={{color:'var(--text-muted)'}}>Manage transaction methods and gateways</p>
         </div>
-        <button onClick={onSave} className="gradient-btn px-6 py-2.5 rounded-xl font-semibold text-white text-sm">
-          Save Settings
-        </button>
+        <div className="flex-shrink-0 ml-4">
+          <button onClick={onSave} className="gradient-btn px-6 py-2.5 rounded-xl font-semibold text-white text-sm">
+            Save Settings
+          </button>
+        </div>
       </div>
 
       <div className="section-container">

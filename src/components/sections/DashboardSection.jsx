@@ -13,11 +13,11 @@ export default function DashboardSection({ orders, products, stats: backendStats
   return (
     <section className="animate-in">
       <div className="page-header">
-        <div>
-          <h1 className="font-display text-2xl font-bold">Dashboard Overview</h1>
-          <p className="text-xs" style={{color:'var(--text-muted)'}}>Real-time store metrics and activity</p>
+        <div className="flex-1 min-w-0">
+          <h1 className="font-display text-2xl font-bold whitespace-nowrap">Dashboard Overview</h1>
+          <p className="text-xs mt-1" style={{color:'var(--text-muted)'}}>Real-time store metrics and activity</p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-shrink-0 ml-4">
           <div className="live-dot"></div>
           <span className="text-xs font-semibold tracking-wider uppercase" style={{color:'var(--accent)'}}>Live Updates</span>
         </div>
@@ -41,36 +41,50 @@ export default function DashboardSection({ orders, products, stats: backendStats
       </div>
 
       <div className="card overflow-hidden animate-in">
-        <div className="p-6 border-b" style={{borderColor:'var(--border)'}}>
-          <h2 className="font-display text-xl font-bold">Recent Orders</h2>
-          <p className="text-sm mt-1" style={{color:'var(--text-muted)'}}>Latest customer orders with contact details</p>
+        <div className="p-5 border-b flex items-center justify-between" style={{borderColor:'var(--border)'}}>
+          <div>
+            <h2 className="font-display text-lg font-bold">Recent Orders</h2>
+            <p className="text-xs mt-0.5" style={{color:'var(--text-muted)'}}>Latest customer orders</p>
+          </div>
+          <span className="text-xs font-semibold px-2.5 py-1 rounded-full" style={{background:'var(--accent-soft)', color:'var(--accent)'}}>Last 5</span>
         </div>
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead style={{background:'var(--bg-secondary)'}}>
-              <tr>
-                {['Order ID','Customer','Address','Phone','Amount','Status'].map(h => (
-                  <th key={h} className="text-left px-6 py-4 text-sm font-semibold" style={{color:'var(--text-secondary)'}}>{h}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {orders.slice(0,5).map(order => (
+        {/* No overflow-x-auto — fixed layout keeps everything in view */}
+        <table className="w-full" style={{tableLayout:'fixed'}}>
+          <thead style={{background:'var(--bg-secondary)'}}>
+            <tr>
+              <th className="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider" style={{color:'var(--text-muted)', width:'20%'}}>Order ID</th>
+              <th className="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider" style={{color:'var(--text-muted)', width:'28%'}}>Customer</th>
+              <th className="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider" style={{color:'var(--text-muted)', width:'20%'}}>Phone</th>
+              <th className="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider" style={{color:'var(--text-muted)', width:'17%'}}>Amount</th>
+              <th className="text-left px-4 py-3 text-[11px] font-bold uppercase tracking-wider" style={{color:'var(--text-muted)', width:'15%'}}>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {orders.slice(0,5).map(order => {
+              const shortId = order.order_id ? order.order_id.replace('ORD-','').slice(0,12) : '—';
+              return (
                 <tr key={order.id || order.order_id} className="table-row border-t" style={{borderColor:'var(--border)'}}>
-                  <td className="px-6 py-4 font-medium whitespace-nowrap">{order.order_id}</td>
-                  <td className="px-6 py-4">
-                    <p className="font-medium">{order.customer_name}</p>
-                    <p className="text-sm" style={{color:'var(--text-muted)'}}>{order.email}</p>
+                  <td className="px-4 py-3" style={{overflow:'hidden'}}>
+                    <span className="font-mono text-xs font-semibold truncate block" style={{color:'var(--accent)'}} title={order.order_id}>#{shortId}</span>
                   </td>
-                  <td className="px-6 py-4 text-sm max-w-[200px] truncate" style={{color:'var(--text-secondary)'}} title={order.address}>{order.address}</td>
-                  <td className="px-6 py-4 text-sm whitespace-nowrap">{order.phone}</td>
-                  <td className="px-6 py-4 font-semibold whitespace-nowrap">{formatPrice(order.total_amount)}</td>
-                  <td className="px-6 py-4"><span className={`status-badge status-${order.status.toLowerCase()}`}>{order.status}</span></td>
+                  <td className="px-4 py-3" style={{overflow:'hidden'}}>
+                    <p className="font-semibold text-sm truncate">{order.customer_name}</p>
+                    <p className="text-xs truncate" style={{color:'var(--text-muted)'}}>{order.email}</p>
+                  </td>
+                  <td className="px-4 py-3 text-sm" style={{overflow:'hidden'}}>
+                    <span className="truncate block">{order.phone || '—'}</span>
+                  </td>
+                  <td className="px-4 py-3 font-bold text-sm" style={{overflow:'hidden'}}>
+                    {formatPrice(order.total_amount)}
+                  </td>
+                  <td className="px-4 py-3">
+                    <span className={`status-badge status-${(order.status||'').toLowerCase()}`}>{order.status}</span>
+                  </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              );
+            })}
+          </tbody>
+        </table>
       </div>
       </div>
     </section>
