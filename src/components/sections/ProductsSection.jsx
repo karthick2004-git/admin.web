@@ -76,66 +76,46 @@ export default function ProductsSection({ products, onAdd, onEdit, onDelete }) {
             </div>
             <input
               type="text"
-              className="input-field pl-9 h-9 text-sm"
-              placeholder="   Search products..."
+              className="input-field search-input h-10 text-sm"
+              placeholder="Search products..."
               value={search}
               onChange={e => setSearch(e.target.value)}
             />
           </div>
 
-          {/* Categories dropdown + Add Category */}
+          {/* Categories dropdown with Add Category integrated */}
           <div className="flex items-center gap-1.5 flex-shrink-0">
             <select
-              className="input-field h-9 text-sm"
-              style={{ width: 180 }}
+              className="input-field h-10 text-sm"
+              style={{ width: 200 }}
               value={category}
-              onChange={e => setCategory(e.target.value)}>
+              onChange={e => {
+                if (e.target.value === 'ADD_NEW') {
+                  const name = window.prompt('Enter new category name:');
+                  if (name) {
+                    const trimmed = name.trim();
+                    const value = trimmed.toLowerCase().replace(/\s+/g, '-');
+                    const label = trimmed.replace(/\b\w/g, l => l.toUpperCase());
+                    if (!categories.find(c => c.value === value)) {
+                      setCategories(prev => [...prev, { value, label }]);
+                    }
+                    setCategory(value);
+                  }
+                } else {
+                  setCategory(e.target.value);
+                }
+              }}>
               <option value="">All Categories</option>
               {categories.map(cat => (
                 <option key={cat.value} value={cat.value}>{cat.label}</option>
               ))}
+              <option value="ADD_NEW" style={{ fontWeight: 'bold', color: 'var(--accent)' }}>+ Add Category</option>
             </select>
-
-            {showAddCat ? (
-              <>
-                <input
-                  type="text"
-                  className="input-field h-9 text-sm"
-                  style={{ width: 130 }}
-                  placeholder="Category name..."
-                  value={newCatName}
-                  onChange={e => setNewCatName(e.target.value)}
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') handleAddCategory();
-                    if (e.key === 'Escape') { setShowAddCat(false); setNewCatName(''); }
-                  }}
-                  autoFocus
-                />
-                <button onClick={handleAddCategory}
-                  className="px-3 h-9 rounded-lg text-white text-sm font-semibold flex-shrink-0"
-                  style={{ background: 'var(--accent)' }}>Add</button>
-                <button onClick={() => { setShowAddCat(false); setNewCatName(''); }}
-                  className="btn-icon flex-shrink-0" style={{ width: 36, height: 36 }}>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </>
-            ) : (
-              <button onClick={() => setShowAddCat(true)}
-                className="flex items-center gap-1 h-9 px-2.5 rounded-lg text-xs font-semibold flex-shrink-0 transition-all"
-                style={{ color: 'var(--accent)', background: 'rgba(0,102,255,0.12)', border: '1px solid rgba(0,102,255,0.2)' }}>
-                <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-                </svg>
-                Add Category
-              </button>
-            )}
           </div>
 
           {/* All Stock dropdown */}
           <select
-            className="input-field h-9 text-sm flex-shrink-0"
+            className="input-field h-10 text-sm flex-shrink-0"
             style={{ width: 150 }}
             value={stockFilter}
             onChange={e => setStockFilter(e.target.value)}>
