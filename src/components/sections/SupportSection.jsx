@@ -44,9 +44,9 @@ export default function SupportSection({ supportRequests, onUpdateStatus }) {
     <>
       <section className="animate-in">
         <div className="page-header">
-          <div>
-            <h1 className="font-display text-2xl font-bold">Support & Complaints</h1>
-            <p className="text-xs" style={{color:'var(--text-muted)'}}>Manage customer inquiries and resolved issues</p>
+          <div className="flex-1 min-w-0">
+            <h1 className="font-display text-2xl font-bold whitespace-nowrap">Support & Complaints</h1>
+            <p className="text-xs mt-1" style={{color:'var(--text-muted)'}}>Manage customer inquiries and resolved issues</p>
           </div>
         </div>
 
