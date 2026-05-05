@@ -16,6 +16,7 @@ import SupportSection from './components/sections/SupportSection';
 import ProductModal from './components/modals/ProductModal';
 import OrderModal from './components/modals/OrderModal';
 import CustomerModal from './components/modals/CustomerModal';
+import LoadingOverlay from './components/LoadingOverlay';
 
 // ── localStorage helpers ──────────────────────────────────────────────────────
 function load(key, fallback) {
@@ -41,7 +42,12 @@ export default function App() {
   const [supportRequests, setSupportRequests] = useState([]);
 
   // ── ui state ──────────────────────────────────────────────────────────────
-  const [activeSection, setActiveSection] = useState('dashboard-section');
+  const [activeSection, setActiveSection] = useState(() => localStorage.getItem('admin_active_section') || 'dashboard-section');
+  const [isAppLoading, setIsAppLoading]   = useState(false);
+  
+  useEffect(() => {
+    localStorage.setItem('admin_active_section', activeSection);
+  }, [activeSection]);
   const [sidebarOpen, setSidebarOpen]     = useState(false);
   const [toasts, setToasts]               = useState([]);
 
@@ -94,6 +100,8 @@ export default function App() {
       localStorage.setItem('admin_token', data.token);
       sessionStorage.setItem('admin_logged_in', 'true');
       setIsLoggedIn(true);
+      setIsAppLoading(true);
+      setTimeout(() => setIsAppLoading(false), 2000);
       showToast('Welcome back, Admin!', 'success');
     } catch (error) {
       showToast(error.message, 'error');
@@ -257,6 +265,10 @@ export default function App() {
         <Login onLogin={handleLogin}/>
       </>
     );
+  }
+
+  if (isAppLoading) {
+    return <LoadingOverlay />;
   }
 
   const sections = {
