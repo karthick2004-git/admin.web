@@ -82,9 +82,49 @@ export default function OrderModal({ isOpen, onClose, order }) {
             </div>
             <div className="p-4 rounded-xl" style={{background:'var(--bg-secondary)'}}>
               <p className="text-sm mb-1" style={{color:'var(--text-muted)'}}>Status</p>
-              <span className={`status-badge status-${order.status}`}>{order.status}</span>
+              <span className={`status-badge status-${(order.status || 'placed').toLowerCase()}`}>{order.status}</span>
             </div>
           </div>
+
+          {(order.payment_proof || order.transaction_id) && (
+            <div className="p-4 rounded-xl border-2 border-dashed" style={{borderColor:'var(--accent-soft)', background:'white'}}>
+              <p className="text-xs font-bold mb-3 uppercase tracking-wider text-blue-600 flex items-center gap-2">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04M12 21.48V22m0-11V3"/></svg>
+                Payment Verification
+              </p>
+              
+              {order.transaction_id && (
+                <div className="mb-3">
+                  <p className="text-[10px] text-gray-400 font-bold uppercase">Transaction ID / UTR</p>
+                  <p className="font-mono text-sm text-blue-700">{order.transaction_id}</p>
+                </div>
+              )}
+
+              {order.payment_proof && (
+                <div>
+                  <p className="text-[10px] text-gray-400 font-bold uppercase mb-2">Proof Screenshot</p>
+                  <div className="relative group">
+                    <img 
+                      src={order.payment_proof} 
+                      alt="Payment Proof" 
+                      className="w-full max-h-64 object-contain rounded-lg border bg-gray-50 p-1"
+                      onError={(e) => {
+                        // Handle case where proof is just a filename string (from route.js line 31)
+                        if (!order.payment_proof.startsWith('data:')) {
+                           e.target.style.display = 'none';
+                           e.target.nextSibling.style.display = 'block';
+                        }
+                      }}
+                    />
+                    <div className="hidden text-xs text-gray-400 p-4 text-center bg-gray-50 rounded-lg border border-dashed">
+                      <p>Screenshot: {order.payment_proof}</p>
+                      <p className="mt-1">(Manual verification required)</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
     </div>
