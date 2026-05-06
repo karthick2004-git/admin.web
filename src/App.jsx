@@ -229,7 +229,7 @@ export default function App() {
     const codMax  = parseInt(document.getElementById('cod-max')?.value);
     
     try {
-      if (upiId) await ApiPage.updatePaymentSettings({ method: 'upi', config: { id: upiId, name: upiName } });
+      if (upiId) await ApiPage.updatePaymentSettings({ method: 'upi', config: { upiId, name: upiName } });
       if (codChg) await ApiPage.updatePaymentSettings({ method: 'cod', config: { charges: codChg, maxOrder: codMax } });
       
       const payData = await ApiPage.fetchPaymentSettings();
@@ -275,7 +275,7 @@ export default function App() {
     'dashboard-section': <DashboardSection orders={orders} products={products} stats={stats}/>,
     'products-section':  <ProductsSection products={products} onAdd={openAddProduct} onEdit={openEditProduct} onDelete={handleDeleteProduct}/>,
     'orders-section':    <OrdersSection orders={orders} onView={handleViewOrder} onUpdateStatus={handleUpdateOrderStatus} onCancel={handleCancelOrder}/>,
-    'payments-section':  <PaymentsSection paymentSettings={paymentSettings} onToggle={handleTogglePayment} onSave={handleSavePayments} onQRUpload={handleQRUpload}/>,
+    'payments-section':  <PaymentsSection paymentSettings={paymentSettings} orders={orders} onToggle={handleTogglePayment} onSave={handleSavePayments} onQRUpload={handleQRUpload} onView={handleViewOrder}/>,
     'checkout-section':  <CheckoutSection orders={orders}/>,
     'customers-section': <CustomersSection customers={customers} onDelete={handleDeleteCustomer} onView={handleViewCustomer}/>,
     'support-section':   <SupportSection supportRequests={supportRequests} onUpdateStatus={handleUpdateSupportStatus}/>,

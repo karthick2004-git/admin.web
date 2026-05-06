@@ -18,6 +18,7 @@ export default function ProductsSection({ products, onAdd, onEdit, onDelete }) {
   const [categories, setCategories] = useState(DEFAULT_CATEGORIES);
   const [showAddCat, setShowAddCat] = useState(false);
   const [newCatName, setNewCatName] = useState('');
+  const [addCatError, setAddCatError] = useState('');
 
   const filtered = products.filter(p => {
     const ms = p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -32,15 +33,36 @@ export default function ProductsSection({ products, onAdd, onEdit, onDelete }) {
 
   const handleAddCategory = () => {
     const trimmed = newCatName.trim();
-    if (!trimmed) return;
+    if (!trimmed) {
+      setAddCatError('Category name is required');
+      return;
+    }
+
     const value = trimmed.toLowerCase().replace(/\s+/g, '-');
     const label = trimmed.replace(/\b\w/g, l => l.toUpperCase());
-    if (!categories.find(c => c.value === value)) {
-      setCategories(prev => [...prev, { value, label }]);
+
+    if (categories.find(c => c.value === value)) {
+      setAddCatError('This category already exists');
+      return;
     }
+
+    setCategories(prev => [...prev, { value, label }]);
     setCategory(value);
     setNewCatName('');
+    setAddCatError('');
     setShowAddCat(false);
+  };
+
+  const openAddCategoryModal = () => {
+    setShowAddCat(true);
+    setAddCatError('');
+    setNewCatName('');
+  };
+
+  const closeAddCategoryModal = () => {
+    setShowAddCat(false);
+    setAddCatError('');
+    setNewCatName('');
   };
 
   return (
@@ -91,16 +113,7 @@ export default function ProductsSection({ products, onAdd, onEdit, onDelete }) {
               value={category}
               onChange={e => {
                 if (e.target.value === 'ADD_NEW') {
-                  const name = window.prompt('Enter new category name:');
-                  if (name) {
-                    const trimmed = name.trim();
-                    const value = trimmed.toLowerCase().replace(/\s+/g, '-');
-                    const label = trimmed.replace(/\b\w/g, l => l.toUpperCase());
-                    if (!categories.find(c => c.value === value)) {
-                      setCategories(prev => [...prev, { value, label }]);
-                    }
-                    setCategory(value);
-                  }
+                  openAddCategoryModal();
                 } else {
                   setCategory(e.target.value);
                 }
@@ -213,6 +226,87 @@ export default function ProductsSection({ products, onAdd, onEdit, onDelete }) {
           </div>
         )}
       </div>
+
+      {showAddCat && (
+        <div
+          className="fixed inset-0 z-[1000] flex items-center justify-center p-4"
+          style={{ background: 'rgba(10, 15, 30, 0.55)' }}
+          onClick={closeAddCategoryModal}
+        >
+          <div
+            className="card w-full"
+            style={{ maxWidth: 460, padding: 24 }}
+            onClick={e => e.stopPropagation()}
+          >
+            <h3 className="font-display text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+              Add New Category
+            </h3>
+            <p className="text-sm mt-1 mb-4" style={{ color: 'var(--text-muted)' }}>
+              Create a category for organizing your products.
+            </p>
+
+            <div className="form-group" style={{ marginBottom: 10 }}>
+              <label htmlFor="new-category-input">Category Name</label>
+              <input
+                id="new-category-input"
+                type="text"
+                className="input-field"
+                placeholder="Example: Hoodies"
+                value={newCatName}
+                onChange={e => {
+                  setNewCatName(e.target.value);
+                  if (addCatError) setAddCatError('');
+                }}
+                onKeyDown={e => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddCategory();
+                  }
+                  if (e.key === 'Escape') {
+                    closeAddCategoryModal();
+                  }
+                }}
+                autoFocus
+              />
+            </div>
+
+            {addCatError && (
+              <div
+                className="text-sm"
+                style={{
+                  marginBottom: 14,
+                  color: 'var(--danger)',
+                  background: 'rgba(239, 68, 68, 0.08)',
+                  border: '1px solid rgba(239, 68, 68, 0.25)',
+                  borderRadius: 10,
+                  padding: '8px 10px'
+                }}
+              >
+                {addCatError}
+              </div>
+            )}
+
+            <div className="flex items-center justify-end gap-2 mt-2">
+              <button
+                type="button"
+                className="btn-icon"
+                style={{ minWidth: 92, height: 40 }}
+                onClick={closeAddCategoryModal}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className="gradient-btn"
+                style={{ minWidth: 120, height: 40 }}
+                onClick={handleAddCategory}
+              >
+                Add Category
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 }
